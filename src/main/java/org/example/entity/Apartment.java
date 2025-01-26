@@ -1,17 +1,19 @@
 package org.example.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
 import java.util.Set;
 
 @Entity
 public class Apartment extends BaseEntity{
+    @Positive
     private int number;
+    @Positive
     private int floor;
+    @Positive
     private BigDecimal area;
     @ManyToOne
     private Building building;
@@ -19,6 +21,8 @@ public class Apartment extends BaseEntity{
     private Set<Owner> owners;
     @ManyToMany(mappedBy = "apartments")
     private Set<Resident> residents;
+    @PositiveOrZero
+    @Column(name="number_of_pets")
     private int numberOfPets;
     @OneToMany(mappedBy = "apartment")
     private Set<Tax> taxes;

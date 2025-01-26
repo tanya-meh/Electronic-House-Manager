@@ -7,7 +7,7 @@ import jakarta.persistence.Id;
 
 import java.util.Set;
 
-@Entity
+@Entity(name = "employee_in_company")
 public class EmployeeInCompany{
     @Id
     @ManyToOne

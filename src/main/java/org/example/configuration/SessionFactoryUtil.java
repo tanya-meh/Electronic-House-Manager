@@ -21,7 +21,6 @@ public class SessionFactoryUtil {
             configuration.addAnnotatedClass(Employee.class);
             configuration.addAnnotatedClass(EmployeeInCompany.class);
             configuration.addAnnotatedClass(Owner.class);
-            configuration.addAnnotatedClass(PaidTax.class);
             configuration.addAnnotatedClass(Person.class);
             configuration.addAnnotatedClass(Resident.class);
             configuration.addAnnotatedClass(Tax.class);

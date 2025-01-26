@@ -6,6 +6,7 @@ import org.example.entity.Resident;
 import org.example.entity.Tax;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Set;
 
 public class ApartmentDto {
@@ -14,10 +15,10 @@ public class ApartmentDto {
     private int floor;
     private BigDecimal area;
     private Building building;
-    private Set<Owner> owners;
-    private Set<Resident> residents;
+    private Set<Owner> owners = new HashSet<>();
+    private Set<Resident> residents = new HashSet<>();
     private int numberOfPets;
-    private Set<Tax> taxes;
+    private Set<Tax> taxes = new HashSet<>();
 
     public ApartmentDto(long id, int number, int floor, BigDecimal area) {
         this.id = id;

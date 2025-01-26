@@ -1,20 +1,29 @@
 package org.example.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 
 import java.math.BigDecimal;
 import java.util.Set;
 
 @Entity
 public class Building extends BaseEntity{
+    @NotBlank
     private String address;
+    @Positive
+    @Column(name = "number_of_floors", nullable = false)
     private int numberOfFloors;
-    private int numberOfApartments;
+    @Positive
+    @Column(name = "built_up_area", nullable = false)
     private BigDecimal builtUpArea;
+    @Positive
+    @Column(name = "common_area", nullable = false)
     private BigDecimal commonArea;
     @OneToMany(mappedBy = "building")
     private Set<Apartment> apartments;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private EmployeeInCompany employeeInCompany;
     @OneToOne(mappedBy = "building")
     private BaseTaxes baseTaxes;
@@ -22,10 +31,9 @@ public class Building extends BaseEntity{
     public Building (){
     }
 
-    public Building(String address, int numberOfFloors, int numberOfApartments, BigDecimal builtUpArea, BigDecimal commonArea) {
+    public Building(String address, int numberOfFloors, BigDecimal builtUpArea, BigDecimal commonArea) {
         this.address = address;
         this.numberOfFloors = numberOfFloors;
-        this.numberOfApartments = numberOfApartments;
         this.builtUpArea = builtUpArea;
         this.commonArea = commonArea;
     }
@@ -36,10 +44,6 @@ public class Building extends BaseEntity{
 
     public int getNumberOfFloors() {
         return numberOfFloors;
-    }
-
-    public int getNumberOfApartments() {
-        return numberOfApartments;
     }
 
     public BigDecimal getBuiltUpArea() {
@@ -70,10 +74,6 @@ public class Building extends BaseEntity{
         this.numberOfFloors = numberOfFloors;
     }
 
-    public void setNumberOfApartments(int numberOfApartments) {
-        this.numberOfApartments = numberOfApartments;
-    }
-
     public void setBuiltUpArea(BigDecimal builtUpArea) {
         this.builtUpArea = builtUpArea;
     }
@@ -100,7 +100,6 @@ public class Building extends BaseEntity{
                 "id=" + super.getId() +
                 ", address='" + address + '\'' +
                 ", numberOfFloors=" + numberOfFloors +
-                ", numberOfApartments=" + numberOfApartments +
                 ", builtUpArea=" + builtUpArea +
                 ", commonArea=" + commonArea +
                 "} ";

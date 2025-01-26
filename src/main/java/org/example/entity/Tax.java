@@ -1,28 +1,31 @@
 package org.example.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
 public class Tax extends BaseEntity{
+    @PastOrPresent(message = "Date of issue cannot be in the future!")
+    @Column(name = "date_of_issue", nullable = false)
     private LocalDate dateOfIssue;
+    @PositiveOrZero
     private BigDecimal amount;
-    @ManyToOne
+    @PastOrPresent(message = "Date of payment cannot be in the future!")
+    @Column(name = "date_of_payment")
+    private LocalDate dateOfPayment;
+    @ManyToOne(fetch = FetchType.LAZY)
     private Apartment apartment;
-    @OneToOne(mappedBy = "tax")
-    private PaidTax paidTax;
 
     public Tax(){
     }
 
-    public Tax(LocalDate dateOfIssue, BigDecimal amount, Apartment apartment){
+    public Tax(LocalDate dateOfIssue){
         this.dateOfIssue = dateOfIssue;
-        this.amount = amount;
-        this.apartment = apartment;
     }
 
     public LocalDate getDateOfIssue() {
@@ -33,12 +36,12 @@ public class Tax extends BaseEntity{
         return amount;
     }
 
-    public Apartment getApartment() {
-        return apartment;
+    public LocalDate getDateOfPayment() {
+        return dateOfPayment;
     }
 
-    public PaidTax getPaidTax() {
-        return paidTax;
+    public Apartment getApartment() {
+        return apartment;
     }
 
     public void setDateOfIssue(LocalDate dateOfIssue) {
@@ -49,13 +52,14 @@ public class Tax extends BaseEntity{
         this.amount = amount;
     }
 
+    public void setDateOfPayment(LocalDate dateOfPayment) {
+        this.dateOfPayment = dateOfPayment;
+    }
+
     public void setApartment(Apartment apartment) {
         this.apartment = apartment;
     }
 
-    public void setPaidTax(PaidTax paidTax) {
-        this.paidTax = paidTax;
-    }
 
     @Override
     public String
@@ -64,7 +68,6 @@ public class Tax extends BaseEntity{
                 "dateOfIssue=" + dateOfIssue +
                 ", amount=" + amount +
                 ", apartment=" + apartment +
-                ", paidTax=" + paidTax +
                 "} " + super.toString();
     }
 }

@@ -1,17 +1,20 @@
 package org.example.service;
 
+import org.example.dao.ApartmentDao;
 import org.example.dao.BuildingDao;
 import org.example.dto.BuildingDto;
 import org.example.dto.CreateBuildingDto;
+import org.example.entity.Apartment;
 import org.example.entity.Building;
 import org.example.entity.EmployeeInCompany;
+
+import java.math.BigDecimal;
 
 public class BuildingService {
     public BuildingDto createBuilding(CreateBuildingDto createBuildingDto) {
         Building building = new Building(
                 createBuildingDto.getAddress(),
                 createBuildingDto.getNumberOfFloors(),
-                createBuildingDto.getNumberOfApartments(),
                 createBuildingDto.getBuiltUpArea(),
                 createBuildingDto.getCommonArea()
         );
@@ -21,7 +24,6 @@ public class BuildingService {
                 building.getId(),
                 building.getAddress(),
                 building.getNumberOfFloors(),
-                building.getNumberOfApartments(),
                 building.getBuiltUpArea(),
                 building.getCommonArea());
     }
@@ -31,7 +33,6 @@ public class BuildingService {
         if(building != null) {
             building.setAddress(buildingDto.getAddress());
             building.setNumberOfFloors(buildingDto.getNumberOfFloors());
-            building.setNumberOfApartments(buildingDto.getNumberOfApartments());
             building.setBuiltUpArea(buildingDto.getBuiltUpArea());
             building.setCommonArea(buildingDto.getCommonArea());
             building.setApartments(buildingDto.getApartments());
@@ -54,6 +55,18 @@ public class BuildingService {
             building.setEmployeeInCompany(employeeInCompany);
             BuildingDao.updateBuilding(building);
         }
+    }
+
+    public void addApartmentToBuilding(long apartmentId, long buildingId) {
+        Apartment apartment = ApartmentDao.getApartmentById(apartmentId);
+        Building building = BuildingDao.getBuildingById(buildingId);
+
+        if(apartment != null && building != null) {
+            apartment.setBuilding(building);
+            ApartmentDao.updateApartment(apartment);
+
+        }
+
     }
 
 }

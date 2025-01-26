@@ -104,6 +104,10 @@ public class CompanyService {
                     });
         }
     }
-
+/*SELECT sum(house_manager.tax.amount) FROM house_manager.tax join house_manager.apartment on house_manager.tax.apartment_id = house_manager.apartment.id
+join house_manager.building on house_manager.apartment.building_id = house_manager.building.id
+join house_manager.company on house_manager.building.employeeInCompany_company_id
+where house_manager.tax.dateOfPayment is not null
+;*/
 
 }

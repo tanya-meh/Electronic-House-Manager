@@ -2,11 +2,13 @@ package org.example.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.Set;
 
 @Entity
 public class Company extends BaseEntity{
+    @NotBlank
     private String name;
     @OneToMany(mappedBy = "company")
     private Set<EmployeeInCompany> employeesInCompany;

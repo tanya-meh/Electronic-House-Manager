@@ -1,14 +1,27 @@
 package org.example.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
 
 @Entity
 public class BaseTaxes extends BaseEntity {
+    @PositiveOrZero
+    @Digits(integer = 3, fraction = 2, message = "Initial capital has to be with max 3 digits before and 2 digits after the decimal separator!")
+    @Column(name = "tax_per_square_meter")
     private BigDecimal taxPerSquareMeter;
+    @PositiveOrZero
+    @Digits(integer = 3, fraction = 2, message = "Initial capital has to be with max 3 digits before and 2 digits after the decimal separator!")
+    @Column(name = "tax_per_resident")
     private BigDecimal taxPerResident;
+    @PositiveOrZero
+    @Digits(integer = 3, fraction = 2, message = "Initial capital has to be with max 3 digits before and 2 digits after the decimal separator!")
+    @Column(name = "tax_per_pet")
     private BigDecimal taxPerPet;
     @OneToOne
     private Building building;
@@ -16,11 +29,10 @@ public class BaseTaxes extends BaseEntity {
     public BaseTaxes() {
     }
 
-    public BaseTaxes(BigDecimal taxPerSquareMeter, BigDecimal taxPerResident, BigDecimal taxPerPet, Building building) {
+    public BaseTaxes(BigDecimal taxPerSquareMeter, BigDecimal taxPerResident, BigDecimal taxPerPet) {
         this.taxPerSquareMeter = taxPerSquareMeter;
         this.taxPerResident = taxPerResident;
         this.taxPerPet = taxPerPet;
-        this.building = building;
     }
 
     public BigDecimal getTaxPerSquareMeter() {

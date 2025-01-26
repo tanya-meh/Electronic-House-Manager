@@ -11,16 +11,14 @@ import java.util.Set;
 public class CreateBuildingDto {
     private String address;
     private int numberOfFloors;
-    private int numberOfApartments;
     private BigDecimal builtUpArea;
     private BigDecimal commonArea;
     public CreateBuildingDto() {
     }
 
-    public CreateBuildingDto(String address, int numberOfFloors, int numberOfApartments, BigDecimal builtUpArea, BigDecimal commonArea) {
+    public CreateBuildingDto(String address, int numberOfFloors, BigDecimal builtUpArea, BigDecimal commonArea) {
         this.address = address;
         this.numberOfFloors = numberOfFloors;
-        this.numberOfApartments = numberOfApartments;
         this.builtUpArea = builtUpArea;
         this.commonArea = commonArea;
     }
@@ -39,14 +37,6 @@ public class CreateBuildingDto {
 
     public void setNumberOfFloors(int numberOfFloors) {
         this.numberOfFloors = numberOfFloors;
-    }
-
-    public int getNumberOfApartments() {
-        return numberOfApartments;
-    }
-
-    public void setNumberOfApartments(int numberOfApartments) {
-        this.numberOfApartments = numberOfApartments;
     }
 
     public BigDecimal getBuiltUpArea() {

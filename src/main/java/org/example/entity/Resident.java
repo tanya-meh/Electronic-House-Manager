@@ -1,14 +1,19 @@
 package org.example.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PositiveOrZero;
 
-import java.time.LocalDate;
+
 import java.util.Set;
 
 @Entity
 public class Resident extends Person {
-    private LocalDate birthDate;
+    @PositiveOrZero
+    private int age;
+    @Column(name = "uses_lift", nullable = false)
     private boolean usesLift;
     @ManyToMany
     private Set<Apartment> apartments;
@@ -17,17 +22,17 @@ public class Resident extends Person {
         super();
     }
 
-    public Resident(String name, LocalDate birthdate, boolean usesLift){
+    public Resident(String name, int age, boolean usesLift){
         super(name);
-        this.birthDate = birthdate;
+        this.age = age;
         this.usesLift = usesLift;
     }
 
-    public LocalDate getBirthDate() {
-        return birthDate;
+    public int getAge() {
+        return age;
     }
 
-    public boolean isUsesLift() {
+    public boolean usesLift() {
         return usesLift;
     }
 
@@ -35,8 +40,8 @@ public class Resident extends Person {
         return apartments;
     }
 
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
+    public void setAge(int age) {
+        this.age = age;
     }
 
     public void setUsesLift(boolean usesLift) {
@@ -50,7 +55,7 @@ public class Resident extends Person {
     @Override
     public String toString() {
         return "Resident{" +
-                "birthDate=" + birthDate +
+                "birthDate=" + age +
                 ", usesLift=" + usesLift +
                 ", apartments=" + apartments +
                 "} " + super.toString();

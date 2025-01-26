@@ -48,7 +48,7 @@ public class ResidentDao {
         Resident resident;
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
-            resident = session.createQuery("select r from Resident r join fetch r.apartments where r.id = :id", Resident.class)
+            resident = session.createQuery("select r from Resident r left join fetch r.apartments where r.id = :id", Resident.class)
                     .setParameter("id", id)
                     .getSingleResult();
             transaction.commit();

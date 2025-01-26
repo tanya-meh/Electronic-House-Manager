@@ -4,6 +4,7 @@ import org.example.configuration.SessionFactoryUtil;
 import org.example.entity.Apartment;
 import org.example.entity.Building;
 import org.example.entity.Owner;
+import org.example.entity.Person;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -48,7 +49,7 @@ public class OwnerDao {
         Owner owner;
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
-            owner = session.createQuery("select o from Owner o join fetch o.apartments where o.id = :id", Owner.class)
+            owner = session.createQuery("select o from Owner o left join fetch o.apartments where o.id = :id", Owner.class)
                     .setParameter("id", id)
                     .getSingleResult();
             transaction.commit();

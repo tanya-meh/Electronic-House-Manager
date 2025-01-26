@@ -2,14 +2,14 @@ package org.example.dao;
 
 import jakarta.persistence.criteria.*;
 import org.example.configuration.SessionFactoryUtil;
-import org.example.entity.Building;
-import org.example.entity.Company;
-import org.example.entity.Employee;
-import org.example.entity.EmployeeInCompany;
+import org.example.dto.CompanyIncomeDto;
+import org.example.entity.*;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 
 public class CompanyDao {
@@ -73,6 +73,35 @@ public class CompanyDao {
             EmployeeInCompany employeeInCompany = query.getSingleResult();
 
             return employeeInCompany;
+
+        }
+    }
+
+    public static List<Object[]> filterCompaniesByIncome(BigDecimal minIncome, BigDecimal maxIncome, boolean ascending) {
+        try(Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Object[]> cr = cb.createQuery(Object[].class);
+            Root<Tax> root = cr.from(Tax.class);
+            Join<Tax, Apartment> taxApartmentJoin = root.join("apartment");
+            Join<Apartment, Building> apartmentBuildingJoin = taxApartmentJoin.join("building");
+            Join<Building, EmployeeInCompany> buildingEmployeeInCompanyJoin = apartmentBuildingJoin.join("employeeInCompany");
+            Join<EmployeeInCompany, Company> employeeInCompanyCompanyJoin = buildingEmployeeInCompanyJoin.join("company");
+
+            cr.multiselect(
+                    employeeInCompanyCompanyJoin.get("id"),
+                    employeeInCompanyCompanyJoin.get("name"),
+                    cb.sum(root.get("amount"))
+            );
+
+            Predicate payedTaxesCondition = cb.isNotNull(root.get("dateOfPayment"));
+            Predicate incomeCondition = cb.between(cb.sum(root.get("amount")), minIncome, maxIncome);
+
+            cr.where(cb.and(payedTaxesCondition, incomeCondition));
+            cr.groupBy(employeeInCompanyCompanyJoin.get("id"), employeeInCompanyCompanyJoin.get("name"));
+            cr.orderBy(ascending ? cb.asc(cb.sum(root.get("amount"))) : cb.desc(cb.sum(root.get("amount"))));
+
+            List<Object[]> result = session.createQuery(cr).getResultList();
+            return result;
 
         }
     }

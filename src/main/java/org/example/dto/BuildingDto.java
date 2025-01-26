@@ -11,18 +11,16 @@ public class BuildingDto {
     private long id;
     private String address;
     private int numberOfFloors;
-    private int numberOfApartments;
     private BigDecimal builtUpArea;
     private BigDecimal commonArea;
     private Set<Apartment> apartments;
     private EmployeeInCompany employeeInCompany;
     private BaseTaxes baseTaxes;
 
-    public BuildingDto(long id, String address, int numberOfFloors, int numberOfApartments, BigDecimal builtUpArea, BigDecimal commonArea) {
+    public BuildingDto(long id, String address, int numberOfFloors, BigDecimal builtUpArea, BigDecimal commonArea) {
         this.id = id;
         this.address = address;
         this.numberOfFloors = numberOfFloors;
-        this.numberOfApartments = numberOfApartments;
         this.builtUpArea = builtUpArea;
         this.commonArea = commonArea;
     }
@@ -49,14 +47,6 @@ public class BuildingDto {
 
     public void setNumberOfFloors(int numberOfFloors) {
         this.numberOfFloors = numberOfFloors;
-    }
-
-    public int getNumberOfApartments() {
-        return numberOfApartments;
-    }
-
-    public void setNumberOfApartments(int numberOfApartments) {
-        this.numberOfApartments = numberOfApartments;
     }
 
     public BigDecimal getBuiltUpArea() {
