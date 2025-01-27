@@ -2,6 +2,7 @@ package org.example;
 
 import org.example.configuration.SessionFactoryUtil;
 import org.example.dao.CompanyDao;
+import org.example.dao.EmployeeDao;
 import org.example.dao.EmployeeInCompanyDao;
 import org.example.dto.*;
 import org.example.entity.BaseTaxes;
@@ -9,6 +10,7 @@ import org.example.service.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -156,7 +158,7 @@ public class Main {
 
         //setting base taxes for building 3
         BaseTaxesDto baseTaxesBuilding3 = baseTaxesService.createBaseTaxes(new CreateBaseTaxesDto(BigDecimal.valueOf(2), BigDecimal.valueOf(7), BigDecimal.valueOf(6)));
-        baseTaxesService.applyBaseTaxesToBuilding(baseTaxesBuilding1.getId(), building1.getId());
+        baseTaxesService.applyBaseTaxesToBuilding(baseTaxesBuilding3.getId(), building3.getId());
 
         //apartment7
         ApartmentDto apartment7 = apartmentService.createApartment(new CreateApartmentDto(1,1,BigDecimal.valueOf(90)));
@@ -247,7 +249,10 @@ public class Main {
         taxService.applyTaxToApartment(tax10.getId(), apartment10.getId());
         taxService.payTax(tax10.getId());
 
+        List<CompanyIncomeDto> companyIncomeDtoList = CompanyDao.filterCompaniesByIncome(BigDecimal.valueOf(400), BigDecimal.valueOf(600),true);
+        companyIncomeDtoList.stream().forEach(System.out::println);
 
-//        System.out.println(CompanyDao.filterCompaniesByIncome(BigDecimal.ZERO,BigDecimal.valueOf(300), false));
+        List<EmployeeNameNumBuildingsDto> employeeNameNumBuildingsDtoList = EmployeeDao.filterCompanyEmployeesByNameAndNumberOfBuildings(2,0,10);
+        employeeNameNumBuildingsDtoList.stream().forEach(System.out::println);
     }
 }

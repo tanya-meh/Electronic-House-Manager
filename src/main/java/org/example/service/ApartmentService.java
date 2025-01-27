@@ -94,18 +94,15 @@ public class ApartmentService {
         BigDecimal taxAmount = BigDecimal.ZERO;
         Apartment apartment = ApartmentDao.getApartmentById(apartmentId);
         if(apartment != null) {
-            System.out.println("apartment is not null");
             Building building = apartment.getBuilding();
             if(building != null) {
-                System.out.println("building is not null");
                 BaseTaxes baseTaxes = building.getBaseTaxes();
                 if(baseTaxes != null) {
-                    System.out.println("baseTaxes is not null");
                     BigDecimal taxPerSquareMeter = baseTaxes.getTaxPerSquareMeter();
                     BigDecimal taxPerResident = baseTaxes.getTaxPerResident();
                     BigDecimal taxPerPet = baseTaxes.getTaxPerPet();
 
-                    long residentsOver7UseLift = ApartmentDao.countResidentsByCriteria(apartmentId);
+                    long residentsOver7UseLift = ApartmentDao.countResidentsOver7UseLiftInApartment(apartmentId);
 
                     taxAmount = (taxPerSquareMeter.multiply(apartment.getArea()))
                             .add(taxPerResident.multiply(BigDecimal.valueOf(residentsOver7UseLift)))

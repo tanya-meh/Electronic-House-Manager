@@ -36,4 +36,13 @@ public class CompanyIncomeDto {
     public void setIncome(BigDecimal income) {
         this.income = income;
     }
+
+    @Override
+    public String toString() {
+        return "CompanyIncomeDto{" +
+                "companyId=" + companyId +
+                ", companyName='" + companyName + '\'' +
+                ", income=" + income +
+                '}';
+    }
 }

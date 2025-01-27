@@ -11,6 +11,7 @@ import org.hibernate.query.Query;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class CompanyDao {
     public static void createCompany(Company company) {
@@ -77,10 +78,13 @@ public class CompanyDao {
         }
     }
 
-    public static List<Object[]> filterCompaniesByIncome(BigDecimal minIncome, BigDecimal maxIncome, boolean ascending) {
+
+    public static List<CompanyIncomeDto> filterCompaniesByIncome(BigDecimal minIncome, BigDecimal maxIncome, boolean asc) {
+        List<Object[]> results;
         try(Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<Object[]> cr = cb.createQuery(Object[].class);
+
             Root<Tax> root = cr.from(Tax.class);
             Join<Tax, Apartment> taxApartmentJoin = root.join("apartment");
             Join<Apartment, Building> apartmentBuildingJoin = taxApartmentJoin.join("building");
@@ -93,17 +97,34 @@ public class CompanyDao {
                     cb.sum(root.get("amount"))
             );
 
+            Predicate havingPredicate = cb.conjunction();
             Predicate payedTaxesCondition = cb.isNotNull(root.get("dateOfPayment"));
-            Predicate incomeCondition = cb.between(cb.sum(root.get("amount")), minIncome, maxIncome);
+            Expression<BigDecimal> incomeExpression = cb.sum(root.get("amount"));
 
-            cr.where(cb.and(payedTaxesCondition, incomeCondition));
-            cr.groupBy(employeeInCompanyCompanyJoin.get("id"), employeeInCompanyCompanyJoin.get("name"));
-            cr.orderBy(ascending ? cb.asc(cb.sum(root.get("amount"))) : cb.desc(cb.sum(root.get("amount"))));
+            if(minIncome != null) {
+                havingPredicate = cb.and(havingPredicate, cb.greaterThanOrEqualTo(incomeExpression, minIncome));
+            }
 
-            List<Object[]> result = session.createQuery(cr).getResultList();
-            return result;
+            if(maxIncome != null) {
+                havingPredicate = cb.and(havingPredicate, cb.lessThanOrEqualTo(incomeExpression, maxIncome));
+            }
 
+            cr.where(payedTaxesCondition);
+            cr.groupBy(employeeInCompanyCompanyJoin.get("id"));
+            cr.having(havingPredicate);
+            cr.orderBy(asc ? cb.asc(incomeExpression) : cb.desc(incomeExpression));
+
+            results = session.createQuery(cr).getResultList();
         }
+
+        return results.stream()
+                .map(result -> new CompanyIncomeDto(
+                        (Long) result[0],
+                        (String) result[1],
+                        (BigDecimal) result[2]))
+                .collect(Collectors.toList());
     }
+
+
 
 }

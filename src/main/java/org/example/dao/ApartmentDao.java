@@ -80,48 +80,23 @@ public class ApartmentDao {
         return apartment.getResidents();
     }
 
-//    public static int getNumberOfResidentsOver7UseLiftInApartment(long id) {
-//        try(Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
-//            CriteriaBuilder cb = session.getCriteriaBuilder();
-//            CriteriaQuery<Resident> cr = cb.createQuery(Resident.class);
-//            Root<Resident> root = cr.from(Resident.class);
-//            Join<Resident, Apartment> a = root.join("buildings", JoinType.LEFT);
-//
-//            cr.select(root).groupBy(root.get("id")).orderBy(cb.asc(cb.count(building.get("id"))));
-//
-//            Query<EmployeeInCompany> query = session.createQuery(cr);
-//            query.setMaxResults(1);
-//            EmployeeInCompany employeeInCompany = query.getSingleResult();
-//
-//            return employeeInCompany;
-//
-//        }
-//    }
 
-    public static long countResidentsByCriteria(Long apartmentId) {
+    public static long countResidentsOver7UseLiftInApartment(Long apartmentId) {
         try(Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             CriteriaBuilder cb = session.getCriteriaBuilder();
-            CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+            CriteriaQuery<Long> cr = cb.createQuery(Long.class);
 
-            // Root for Apartment
-            Root<Apartment> apartmentRoot = cq.from(Apartment.class);
+            Root<Apartment> root = cr.from(Apartment.class);
+            Join<Apartment, Resident> apartmentResidentJoin = root.join("residents");
 
-            // Join Residents
-            Join<Apartment, Resident> residentJoin = apartmentRoot.join("residents");
+            Predicate apartmentPredicate = cb.equal(root.get("id"), apartmentId);
+            Predicate agePredicate = cb.greaterThan(apartmentResidentJoin.get("age"), 7);
+            Predicate usesLiftPredicate = cb.equal(apartmentResidentJoin.get("usesLift"), true);
 
-            // Build the predicates (criteria)
-            Predicate apartmentPredicate = cb.equal(apartmentRoot.get("id"), apartmentId);
-            Predicate agePredicate = cb.greaterThan(residentJoin.get("age"), 7);
-            Predicate usesLiftPredicate = cb.equal(residentJoin.get("usesLift"), true);
-
-            // Combine the predicates
             Predicate combinedPredicate = cb.and(apartmentPredicate, agePredicate, usesLiftPredicate);
+            cr.select(cb.count(apartmentResidentJoin)).where(combinedPredicate);
 
-            // Select the count
-            cq.select(cb.count(residentJoin)).where(combinedPredicate);
-
-            // Execute the query
-            return session.createQuery(cq).getSingleResult();
+            return session.createQuery(cr).getSingleResult();
         }
     }
 
