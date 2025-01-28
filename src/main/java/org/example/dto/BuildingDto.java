@@ -13,7 +13,6 @@ public class BuildingDto {
     private int numberOfFloors;
     private BigDecimal builtUpArea;
     private BigDecimal commonArea;
-    private Set<Apartment> apartments;
     private EmployeeInCompany employeeInCompany;
     private BaseTaxes baseTaxes;
 
@@ -63,14 +62,6 @@ public class BuildingDto {
 
     public void setCommonArea(BigDecimal commonArea) {
         this.commonArea = commonArea;
-    }
-
-    public Set<Apartment> getApartments() {
-        return apartments;
-    }
-
-    public void setApartments(Set<Apartment> apartments) {
-        this.apartments = apartments;
     }
 
     public EmployeeInCompany getEmployeeInCompany() {

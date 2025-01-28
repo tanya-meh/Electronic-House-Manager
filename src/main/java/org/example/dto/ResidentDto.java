@@ -3,6 +3,7 @@ package org.example.dto;
 import org.example.entity.Apartment;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 public class ResidentDto {
@@ -10,7 +11,6 @@ public class ResidentDto {
     private String name;
     private int age;
     private boolean usesLift;
-    private Set<Apartment> apartments;
 
     public ResidentDto(long id, String name) {
         this.id = id;
@@ -62,11 +62,4 @@ public class ResidentDto {
         this.age = age;
     }
 
-    public Set<Apartment> getApartments() {
-        return apartments;
-    }
-
-    public void setApartments(Set<Apartment> apartments) {
-        this.apartments = apartments;
-    }
 }

@@ -2,12 +2,10 @@ package org.example.service;
 
 
 import org.example.dao.ApartmentDao;
-import org.example.dao.BuildingDao;
 import org.example.dao.OwnerDao;
 import org.example.dao.ResidentDao;
 import org.example.dto.ApartmentDto;
 import org.example.dto.CreateApartmentDto;
-import org.example.dto.OwnerDto;
 import org.example.entity.*;
 
 import java.math.BigDecimal;
@@ -37,11 +35,11 @@ public class ApartmentService {
             apartment.setFloor(apartmentDto.getFloor());
             apartment.setArea(apartmentDto.getArea());
             apartment.setBuilding(apartmentDto.getBuilding());
-            apartment.setOwners(apartmentDto.getOwners());
-            apartment.setResidents(apartmentDto.getResidents());
             apartment.setNumberOfPets(apartmentDto.getNumberOfPets());
-            apartment.setTaxes(apartmentDto.getTaxes());
+        } else {
+            throw new IllegalArgumentException("Apartment not found.");
         }
+
         ApartmentDao.updateApartment(apartment);
     }
 
@@ -49,6 +47,18 @@ public class ApartmentService {
         Apartment apartment = ApartmentDao.getApartmentById(id);
         if(apartment != null) {
             ApartmentDao.deleteApartment(apartment);
+        } else {
+            throw new IllegalArgumentException("Apartment not found.");
+        }
+    }
+
+    public void setNumOfPetsInApartment(int numOfPets, long apartmentId) {
+        Apartment apartment = ApartmentDao.getApartmentById(apartmentId);
+        if(apartment != null) {
+            apartment.setNumberOfPets(numOfPets);
+            ApartmentDao.updateApartment(apartment);
+        } else {
+            throw new IllegalArgumentException("Apartment not found.");
         }
     }
 
@@ -110,6 +120,8 @@ public class ApartmentService {
 
                 }
             }
+        } else {
+            throw new IllegalArgumentException("Apartment not found.");
         }
         return taxAmount;
 

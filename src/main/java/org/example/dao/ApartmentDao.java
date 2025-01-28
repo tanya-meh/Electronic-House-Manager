@@ -1,6 +1,8 @@
 package org.example.dao;
 
+import jakarta.persistence.PersistenceException;
 import jakarta.persistence.criteria.*;
+import jakarta.validation.Valid;
 import org.example.configuration.SessionFactoryUtil;
 import org.example.entity.*;
 import org.hibernate.Session;
@@ -10,7 +12,7 @@ import org.hibernate.query.Query;
 import java.util.Set;
 
 public class ApartmentDao {
-    public static void createApartment(Apartment apartment) {
+    public static void createApartment(@Valid Apartment apartment) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.save(apartment);
@@ -18,7 +20,7 @@ public class ApartmentDao {
         }
     }
 
-    public static void updateApartment(Apartment apartment) {
+    public static void updateApartment(@Valid Apartment apartment) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.saveOrUpdate(apartment);
@@ -26,7 +28,7 @@ public class ApartmentDao {
         }
     }
 
-    public static void deleteApartment(Apartment apartment) {
+    public static void deleteApartment(@Valid Apartment apartment) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.delete(apartment);

@@ -4,11 +4,13 @@ public class EmployeeNameNumBuildingsDto {
     private long employeeId;
     private String employeeName;
     private long numBuildings;
+    private long companyId;
 
-    public EmployeeNameNumBuildingsDto(long employeeId, String employeeName, long numBuildings) {
+    public EmployeeNameNumBuildingsDto(long employeeId, String employeeName, long numBuildings, long companyId) {
         this.employeeId = employeeId;
         this.employeeName = employeeName;
         this.numBuildings = numBuildings;
+        this.companyId = companyId;
     }
 
     public long getEmployeeId() {
@@ -35,12 +37,21 @@ public class EmployeeNameNumBuildingsDto {
         this.numBuildings = numBuildings;
     }
 
+    public long getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(long companyId) {
+        this.companyId = companyId;
+    }
+
     @Override
     public String toString() {
         return "EmployeeNameNumBuildingsDto{" +
                 "employeeId=" + employeeId +
                 ", employeeName='" + employeeName + '\'' +
                 ", numBuildings=" + numBuildings +
+                ", companyId=" + companyId +
                 '}';
     }
 }

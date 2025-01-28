@@ -4,17 +4,22 @@ import org.example.configuration.SessionFactoryUtil;
 import org.example.dao.CompanyDao;
 import org.example.dao.EmployeeDao;
 import org.example.dao.EmployeeInCompanyDao;
+import org.example.dao.ResidentDao;
 import org.example.dto.*;
 import org.example.entity.BaseTaxes;
 import org.example.service.*;
+import org.example.utility.TaxLogger;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
         SessionFactoryUtil.getSessionFactory().openSession();
+
+        TaxLogger.initializeLogFile();
 
         CompanyService companyService = new CompanyService();
         EmployeeService employeeService = new EmployeeService();
@@ -50,7 +55,7 @@ public class Main {
                 //adding apartment to building
         buildingService.addApartmentToBuilding(apartment1.getId(), building1.getId());
 
-                //apartment 2
+               //apartment 2
         ApartmentDto apartment2 = apartmentService.createApartment(new CreateApartmentDto(2,1,BigDecimal.valueOf(65)));
                 //adding apartment to building
         buildingService.addApartmentToBuilding(apartment2.getId(), building1.getId());
@@ -82,12 +87,11 @@ public class Main {
         //lives in apartment 2
         apartmentService.addResidentToApartment(resident2.getId(), apartment2.getId());
 
-        //with two pets
-        apartment1.setNumberOfPets(2);
-        apartmentService.updateApartment(apartment1);
+         //with two pets
+        apartmentService.setNumOfPetsInApartment(2, apartment1.getId());
 
         //resident 3
-        ResidentDto resident3 = residentService.createResident(new ResidentDto("Viktor Viktorov", 5, true));
+        ResidentDto resident3 = residentService.createResident(new ResidentDto("Viktor Viktorov", 6, true));
         //lives in apartment 3
         apartmentService.addResidentToApartment(resident3.getId(), apartment3.getId());
 
@@ -115,8 +119,7 @@ public class Main {
         //adding resident
         apartmentService.addResidentToApartment(resident1.getId(), apartment4.getId());
         //adding a pet
-        apartment4.setNumberOfPets(1);
-        apartmentService.updateApartment(apartment4);
+        apartmentService.setNumOfPetsInApartment(1, apartment4.getId());
 
         //apartment 5
         ApartmentDto apartment5 = apartmentService.createApartment(new CreateApartmentDto(4,3,BigDecimal.valueOf(95)));
@@ -181,7 +184,6 @@ public class Main {
         //lives in apartment 7
         apartmentService.addResidentToApartment(resident5.getId(), apartment7.getId());
 
-        //////////////////////////////////////////////
 
         //company 3
         CompanyDto company3 = companyService.createCompany(new CompanyDto("Building manager"));
@@ -210,8 +212,7 @@ public class Main {
         //adding apartment to building
         buildingService.addApartmentToBuilding(apartment10.getId(), building4.getId());
 
-
-        //
+        //Creating taxes for every apartment
         TaxDto tax1 = taxService.createTax(new CreateTaxDto(LocalDate.now()));
         taxService.applyTaxToApartment(tax1.getId(), apartment1.getId());
         taxService.payTax(tax1.getId());
@@ -249,10 +250,69 @@ public class Main {
         taxService.applyTaxToApartment(tax10.getId(), apartment10.getId());
         taxService.payTax(tax10.getId());
 
-        List<CompanyIncomeDto> companyIncomeDtoList = CompanyDao.filterCompaniesByIncome(BigDecimal.valueOf(400), BigDecimal.valueOf(600),true);
-        companyIncomeDtoList.stream().forEach(System.out::println);
+        //filtering companies by income, result sorted in ascending order
+        List<CompanyIncomeDto> companyIncomeDtoList = companyService.filterCompaniesByIncome(BigDecimal.valueOf(400), BigDecimal.valueOf(600),true);
+        companyIncomeDtoList.forEach(System.out::println);
 
-        List<EmployeeNameNumBuildingsDto> employeeNameNumBuildingsDtoList = EmployeeDao.filterCompanyEmployeesByNameAndNumberOfBuildings(2,0,10);
-        employeeNameNumBuildingsDtoList.stream().forEach(System.out::println);
+        //filtering employees in company by name and number of building they service
+        List<EmployeeNameNumBuildingsDto> employeeNameNumBuildingsDtoList = employeeService.filterCompanyEmployeesByNameAndNumberOfBuildings(company2.getId(),"ivan", 0,10);
+        employeeNameNumBuildingsDtoList.forEach(System.out::println);
+
+        System.out.println();
+
+        employeeNameNumBuildingsDtoList = employeeService.filterCompanyEmployeesByNameAndNumberOfBuildings(company2.getId(),"", 5,10);
+        employeeNameNumBuildingsDtoList.forEach(System.out::println);
+
+        //filtering residents in building by name and age
+        List<ResidentNameAgeBuildingDto> residentNameAgeBuildingDtoList = residentService.filterResidentsInBuildingByNameAndAge(building1.getId(),"ova", 6, 100);
+        residentNameAgeBuildingDtoList.forEach(System.out::println);
+
+        //sorting residents in building by name and age
+        residentNameAgeBuildingDtoList = residentService.sortResidentsInBuildingByNameAndAge(building1.getId(), false, false);
+        residentNameAgeBuildingDtoList.forEach(System.out::println);
+
+        //getting buildings serviced by employees of company
+        List<CompanyEmployeeBuildingDto> companyEmployeeBuildingDtoList = companyService.buildingsServicedByEmployeesInCompany(company1.getId());
+        companyEmployeeBuildingDtoList.forEach(System.out::println);
+
+        //getting number of buildings serviced by employees of company
+        companyEmployeeBuildingDtoList = companyService.numberOfBuildingsServicedByEmployeesInCompany(company1.getId());
+        companyEmployeeBuildingDtoList.forEach(System.out::println);
+
+        //getting unpayed taxes for company
+        List<TaxDto> unpaidTaxesCompany2 = companyService.getCompanyUnpaidTaxes(company2.getId());
+        unpaidTaxesCompany2.forEach(System.out::println);
+        //getting sum of unpaid taxes for company
+        System.out.println(companyService.getCompanySumUnpaidTaxes(company2.getId()));
+
+        //getting payed taxes for company
+        List<TaxDto> paidTaxesCompany1 = companyService.getCompanyPaidTaxes(company1.getId());
+        paidTaxesCompany1.forEach(System.out::println);
+        //getting sum of payed taxes for company
+        System.out.println(companyService.getCompanySumPaidTaxes(company1.getId()));
+
+        //getting unpayed taxes for building
+        List<TaxDto> unpaidTaxesBuilding2 = buildingService.getBuildingUnpaidTaxes(building2.getId());
+        unpaidTaxesBuilding2.forEach(System.out::println);
+        //getting sum of unpayed taxes for building
+        System.out.println(buildingService.getBuildingSumUnpaidTaxes(building2.getId()));
+
+        //getting payed taxes for building
+        List<TaxDto> paidTaxesBuilding2 = buildingService.getBuildingPaidTaxes(building2.getId());
+        paidTaxesBuilding2.forEach(System.out::println);
+        //getting sum of payed taxes for building
+        System.out.println(buildingService.getBuildingSumPaidTaxes(building2.getId()));
+
+        //getting unpayed taxes for employee
+        List<TaxDto> unpaidTaxesEmployee1 = employeeService.getEmployeeUnpaidTaxes(employee1.getId());
+        unpaidTaxesEmployee1.forEach(System.out::println);
+        //getting sum of unpayed taxes for employee
+        System.out.println(employeeService.getEmployeeSumUnpaidTaxes(employee1.getId()));
+
+        //getting payed taxes for employee
+        List<TaxDto> paidTaxesEmployee1 = employeeService.getEmployeePaidTaxes(employee1.getId());
+        paidTaxesEmployee1.forEach(System.out::println);
+        //getting sum of payed taxes for employee
+        System.out.println(employeeService.getEmployeeSumPaidTaxes(employee1.getId()));
     }
 }

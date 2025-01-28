@@ -1,12 +1,13 @@
 package org.example.dao;
 
+import jakarta.validation.Valid;
 import org.example.configuration.SessionFactoryUtil;
 import org.example.entity.Person;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 public class PersonDao {
-    public static void createPerson(Person Person) {
+    public static void createPerson(@Valid Person Person) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.save(Person);
@@ -14,7 +15,7 @@ public class PersonDao {
         }
     }
 
-    public static void updatePerson(Person Person) {
+    public static void updatePerson(@Valid Person Person) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.saveOrUpdate(Person);
@@ -22,7 +23,7 @@ public class PersonDao {
         }
     }
 
-    public static void deletePerson(Person Person) {
+    public static void deletePerson(@Valid Person Person) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.delete(Person);

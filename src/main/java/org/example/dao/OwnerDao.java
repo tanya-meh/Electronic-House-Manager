@@ -1,5 +1,6 @@
 package org.example.dao;
 
+import jakarta.validation.Valid;
 import org.example.configuration.SessionFactoryUtil;
 import org.example.entity.Apartment;
 import org.example.entity.Building;
@@ -11,7 +12,7 @@ import org.hibernate.Transaction;
 import java.util.Set;
 
 public class OwnerDao {
-    public static void createOwner(Owner owner) {
+    public static void createOwner(@Valid Owner owner) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.save(owner);
@@ -19,7 +20,7 @@ public class OwnerDao {
         }
     }
 
-    public static void updateOwner(Owner owner) {
+    public static void updateOwner(@Valid Owner owner) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.saveOrUpdate(owner);
@@ -27,7 +28,7 @@ public class OwnerDao {
         }
     }
 
-    public static void deleteOwner(Owner owner) {
+    public static void deleteOwner(@Valid Owner owner) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.delete(owner);

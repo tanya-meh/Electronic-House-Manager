@@ -7,8 +7,6 @@ import java.util.Set;
 public class OwnerDto {
     private long id;
     private String name;
-    private Set<Apartment> apartments;
-
     public OwnerDto(long id, String name) {
         this.id = id;
         this.name = name;
@@ -30,11 +28,4 @@ public class OwnerDto {
         this.name = name;
     }
 
-    public Set<Apartment> getApartments() {
-        return apartments;
-    }
-
-    public void setApartments(Set<Apartment> apartments) {
-        this.apartments = apartments;
-    }
 }

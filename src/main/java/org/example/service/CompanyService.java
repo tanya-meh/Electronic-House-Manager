@@ -4,20 +4,24 @@ import org.example.dao.BuildingDao;
 import org.example.dao.CompanyDao;
 import org.example.dao.EmployeeDao;
 import org.example.dao.EmployeeInCompanyDao;
-import org.example.dto.CompanyDto;
-import org.example.dto.HiredEmployeeInCompanyDto;
+import org.example.dto.*;
 import org.example.entity.Building;
 import org.example.entity.Company;
 import org.example.entity.Employee;
 import org.example.entity.EmployeeInCompany;
+import org.example.exception.EntitiesNotConnectedException;
+import org.example.exception.IllegalAmountException;
+import org.example.exception.IllegalAmountOfMoneyException;
+import org.example.exception.MinimumGreaterThanMaximumException;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 
 public class CompanyService {
     public CompanyDto createCompany(CompanyDto companyDto) {
         Company company = new Company(
-                companyDto.getName(),
-                companyDto.getEmployeesInCompany()
+                companyDto.getName()
         );
 
         CompanyDao.createCompany(company);
@@ -29,7 +33,8 @@ public class CompanyService {
         Company company = CompanyDao.getCompanyById(companyDto.getId());
         if(company != null) {
             company.setName(companyDto.getName());
-            company.setEmployeesInCompany(companyDto.getEmployeesInCompany());
+        } else {
+            throw new IllegalArgumentException("Company not found");
         }
         CompanyDao.updateCompany(company);
     }
@@ -38,6 +43,8 @@ public class CompanyService {
         Company company = CompanyDao.getCompanyById(id);
         if(company != null) {
             CompanyDao.deleteCompany(company);
+        } else {
+            throw new IllegalArgumentException("Company not found");
         }
     }
 
@@ -50,17 +57,18 @@ public class CompanyService {
             EmployeeInCompanyDao.createEmployeeInCompany(employeeInCompany);
 
             return new HiredEmployeeInCompanyDto(employeeInCompany.getEmployee(), employeeInCompany.getCompany());
+        } else {
+            throw new IllegalArgumentException("Employee or Company not found.");
         }
-
-        return null;
     }
 
     public EmployeeInCompany getEmployeeInCompanyWithLeastBuildings(long companyId) {
         Company company = CompanyDao.getCompanyById(companyId);
         if(company != null) {
             return CompanyDao.getEmployeeInCompanyWithLeastBuildings(companyId);
+        }else {
+            throw new IllegalArgumentException("Company not found.");
         }
-        return null;
     }
 
     public void assignBuildingToEmployeeInCompany(long buildingId, long companyId) {
@@ -68,25 +76,24 @@ public class CompanyService {
         if(employeeInCompany != null) {
             BuildingService buildingService = new BuildingService();
             buildingService.setEmployeeInCompany(buildingId, employeeInCompany);
+        }else {
+            throw new IllegalArgumentException("Building or Company not found.");
         }
     }
 
     public void fireEmployeeInCompany(long employeeId, long companyId) {
-        System.out.println("firing employee in company");
         Company company = CompanyDao.getCompanyById(companyId);
         Employee employee = EmployeeDao.getEmployeeById(employeeId);
         EmployeeInCompany employeeInCompany;
 
         if(company != null && employee != null) {
             employeeInCompany = EmployeeInCompanyDao.getEmployeeInCompanyByEmployeeAndCompanyId(employeeId, companyId);
-            System.out.println("employee in company " + employeeInCompany);
         } else {
-            return;
+            throw new IllegalArgumentException("Employee or Company not found.");
         }
 
         if(employeeInCompany != null) {
             //unlinking the buildings from the employeeInCompany
-            System.out.println("unlinking");
             Set<Building> buildings = EmployeeInCompanyDao.getEmployeeInCompanyBuildings(employeeId, companyId);
             buildings.forEach(building -> {
                         building.setEmployeeInCompany(null);
@@ -94,22 +101,66 @@ public class CompanyService {
                     });
 
             //deleting the employeeInCompany
-            System.out.println("deleting");
             EmployeeInCompanyDao.deleteEmployeeInCompany(employeeInCompany);
 
             //reassigning the buildings to other employees in the company
-            System.out.println("reassigning");
             buildings.forEach(building -> {
                         assignBuildingToEmployeeInCompany(building.getId(), companyId);
-                    });
+            });
+        } else {
+            throw new EntitiesNotConnectedException("Employee not hired in Company");
         }
     }
-/*SELECT house_manager.company.id, house_manager.company.name, sum(house_manager.tax.amount) FROM house_manager.tax
-join house_manager.apartment on house_manager.tax.apartment_id = house_manager.apartment.id
-join house_manager.building on house_manager.apartment.building_id = house_manager.building.id
-join house_manager.company on house_manager.building.employeeInCompany_company_id = house_manager.company.id
-where house_manager.tax.date_of_payment is not null
-group by house_manager.company.id
-;*/
 
+    public List<CompanyIncomeDto> filterCompaniesByIncome(BigDecimal minIncome, BigDecimal maxIncome, boolean asc) {
+        if(minIncome.compareTo(BigDecimal.ZERO) < 0 || maxIncome.compareTo(BigDecimal.ZERO) < 0 ){
+            throw new IllegalAmountOfMoneyException("minIncome and maxIncome should not be negative numbers.");
+        }
+        if (minIncome.compareTo(maxIncome) > 0) {
+            throw new MinimumGreaterThanMaximumException("minIncome greater than maxIncome.");
+        }
+        return CompanyDao.filterCompaniesByIncome(minIncome, maxIncome, asc);
+    }
+
+    public List<CompanyEmployeeBuildingDto> buildingsServicedByEmployeesInCompany(long companyId) {
+        if(CompanyDao.getCompanyById(companyId) == null){
+            throw new IllegalArgumentException("Company not found.");
+        }
+        return CompanyDao.buildingsServicedByEmployeesInCompany(companyId);
+    }
+
+    public List<CompanyEmployeeBuildingDto> numberOfBuildingsServicedByEmployeesInCompany(long companyId) {
+        if(CompanyDao.getCompanyById(companyId) == null){
+            throw new IllegalArgumentException("Company not found.");
+        }
+        return CompanyDao.numberOfBuildingsServicedByEmployeesInCompany(companyId);
+    }
+
+    public BigDecimal getCompanySumUnpaidTaxes(long companyId) {
+        if(CompanyDao.getCompanyById(companyId) == null){
+            throw new IllegalArgumentException("Company not found.");
+        }
+        return CompanyDao.getCompanySumUnpaidTaxes(companyId);
+    }
+
+    public BigDecimal getCompanySumPaidTaxes(long companyId) {
+        if(CompanyDao.getCompanyById(companyId) == null){
+            throw new IllegalArgumentException("Company not found.");
+        }
+        return CompanyDao.getCompanySumPaidTaxes(companyId);
+    }
+
+    public List<TaxDto> getCompanyUnpaidTaxes(long companyId) {
+        if(CompanyDao.getCompanyById(companyId) == null){
+            throw new IllegalArgumentException("Company not found.");
+        }
+        return CompanyDao.getCompanyUnpaidTaxes(companyId);
+    }
+
+    public List<TaxDto> getCompanyPaidTaxes(long companyId) {
+        if(CompanyDao.getCompanyById(companyId) == null){
+            throw new IllegalArgumentException("Company not found.");
+        }
+        return CompanyDao.getCompanyPaidTaxes(companyId);
+    }
 }

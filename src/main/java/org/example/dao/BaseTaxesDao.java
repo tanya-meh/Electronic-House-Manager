@@ -1,12 +1,13 @@
 package org.example.dao;
 
+import jakarta.validation.Valid;
 import org.example.configuration.SessionFactoryUtil;
 import org.example.entity.BaseTaxes;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 public class BaseTaxesDao {
-    public static void createBaseTaxes(BaseTaxes baseTaxes) {
+    public static void createBaseTaxes(@Valid BaseTaxes baseTaxes) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.save(baseTaxes);
@@ -14,7 +15,7 @@ public class BaseTaxesDao {
         }
     }
 
-    public static void updateBaseTaxes(BaseTaxes baseTaxes) {
+    public static void updateBaseTaxes(@Valid BaseTaxes baseTaxes) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.saveOrUpdate(baseTaxes);
@@ -22,7 +23,7 @@ public class BaseTaxesDao {
         }
     }
 
-    public static void deleteBaseTaxes(BaseTaxes baseTaxes) {
+    public static void deleteBaseTaxes(@Valid BaseTaxes baseTaxes) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.delete(baseTaxes);

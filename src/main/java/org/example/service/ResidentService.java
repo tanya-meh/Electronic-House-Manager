@@ -1,9 +1,14 @@
 package org.example.service;
 
+import org.example.dao.BuildingDao;
 import org.example.dao.ResidentDao;
 import org.example.dto.PersonDto;
 import org.example.dto.ResidentDto;
+import org.example.dto.ResidentNameAgeBuildingDto;
 import org.example.entity.Resident;
+import org.example.exception.MinimumGreaterThanMaximumException;
+
+import java.util.List;
 
 public class ResidentService {
     public ResidentDto createResident(ResidentDto residentDto) {
@@ -41,7 +46,8 @@ public class ResidentService {
             resident.setName(residentDto.getName());
             resident.setAge(residentDto.getAge());
             resident.setUsesLift(residentDto.usesLift());
-            resident.setApartments(residentDto.getApartments());
+        } else {
+            throw new IllegalArgumentException("Resident not found.");
         }
         ResidentDao.updateResident(resident);
     }
@@ -50,7 +56,28 @@ public class ResidentService {
         Resident resident = ResidentDao.getResidentById(id);
         if(resident != null) {
             ResidentDao.deleteResident(resident);
+        } else {
+            throw new IllegalArgumentException("Resident not found.");
         }
+    }
+
+
+    public List<ResidentNameAgeBuildingDto> filterResidentsInBuildingByNameAndAge(long buildingId, String name, int minAge, int maxAge) {
+        if(BuildingDao.getBuildingById(buildingId) == null) {
+             throw new IllegalArgumentException("Building not found.");
+        }
+
+        if(minAge > maxAge) {
+            throw new MinimumGreaterThanMaximumException("minAge greater than maxAge.");
+        }
+        return ResidentDao.filterResidentsInBuildingByNameAndAge(buildingId, name, minAge, maxAge);
+    }
+
+    public List<ResidentNameAgeBuildingDto> sortResidentsInBuildingByNameAndAge(long buildingId, boolean nameAsc, boolean ageAsc) {
+        if(BuildingDao.getBuildingById(buildingId) == null) {
+            throw new IllegalArgumentException("Building not found.");
+        }
+        return ResidentDao.sortResidentsInBuildingByNameAndAge(buildingId, nameAsc, ageAsc);
     }
 
 

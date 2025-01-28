@@ -7,7 +7,6 @@ import java.util.Set;
 public class CompanyDto {
     private long id;
     private String name;
-    private Set<EmployeeInCompany> employeesInCompany;
 
     public CompanyDto() {
     }
@@ -37,11 +36,4 @@ public class CompanyDto {
         this.name = name;
     }
 
-    public Set<EmployeeInCompany> getEmployeesInCompany() {
-        return employeesInCompany;
-    }
-
-    public void setEmployeesInCompany(Set<EmployeeInCompany> employeesInCompany) {
-        this.employeesInCompany = employeesInCompany;
-    }
 }

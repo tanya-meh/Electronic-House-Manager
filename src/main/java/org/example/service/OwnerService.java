@@ -37,7 +37,8 @@ public class OwnerService {
         Owner owner = OwnerDao.getOwnerById(OwnerDto.getId());
         if(owner != null) {
             owner.setName(OwnerDto.getName());
-            owner.setApartments(OwnerDto.getApartments());
+        } else {
+            throw new IllegalArgumentException("Owner not found");
         }
         OwnerDao.updateOwner(owner);
     }
@@ -46,6 +47,6 @@ public class OwnerService {
         Owner owner = OwnerDao.getOwnerById(id);
         if(owner != null) {
             OwnerDao.deleteOwner(owner);
-        }
+        } throw new IllegalArgumentException("Owner not found.");
     }
 }

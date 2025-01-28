@@ -3,9 +3,11 @@ package org.example.service;
 import org.example.dao.ApartmentDao;
 import org.example.dao.TaxDao;
 import org.example.dto.CreateTaxDto;
+import org.example.dto.PayedTaxFullInformationDto;
 import org.example.dto.TaxDto;
 import org.example.entity.Apartment;
 import org.example.entity.Tax;
+import org.example.utility.TaxLogger;
 
 import java.time.LocalDate;
 
@@ -28,6 +30,8 @@ public class TaxService {
             tax.setAmount(taxDto.getAmount());
             tax.setDateOfPayment(taxDto.getDateOfPayment());
             tax.setApartment(taxDto.getApartment());
+        } else {
+            throw new IllegalArgumentException("Tax not found.");
         }
         TaxDao.updateTax(tax);
     }
@@ -36,6 +40,8 @@ public class TaxService {
         Tax tax = TaxDao.getTaxById(id);
         if(tax != null) {
             TaxDao.deleteTax(tax);
+        } else {
+            throw new IllegalArgumentException("Tax not found.");
         }
     }
 
@@ -49,13 +55,22 @@ public class TaxService {
             tax.setAmount(apartmentService.calculateTaxAmountForApartment(apartmentId));
 
             TaxDao.updateTax(tax);
+        } else {
+            throw new IllegalArgumentException("Tax or Apartment not found.");
         }
     }
 
     public void payTax(long taxId) {
         Tax tax = TaxDao.getTaxById(taxId);
+        if(tax == null) {
+            throw new IllegalArgumentException("Tax not found.");
+        }
+
         tax.setDateOfPayment(LocalDate.now());
         TaxDao.updateTax(tax);
+
+        PayedTaxFullInformationDto  payedTaxFullInformationDto = TaxDao.getTaxFullInformation(taxId);
+        TaxLogger.logPayedTax(payedTaxFullInformationDto.getLog());
     }
 
 }

@@ -1,20 +1,24 @@
 package org.example.dao;
 
 import jakarta.persistence.criteria.*;
+import jakarta.validation.Valid;
 import org.example.configuration.SessionFactoryUtil;
+import org.example.dto.CompanyEmployeeBuildingDto;
 import org.example.dto.CompanyIncomeDto;
+import org.example.dto.TaxDto;
 import org.example.entity.*;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CompanyDao {
-    public static void createCompany(Company company) {
+    public static void createCompany(@Valid Company company) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.save(company);
@@ -22,7 +26,7 @@ public class CompanyDao {
         }
     }
 
-    public static void updateCompany(Company company) {
+    public static void updateCompany(@Valid Company company) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.saveOrUpdate(company);
@@ -30,7 +34,7 @@ public class CompanyDao {
         }
     }
 
-    public static void deleteCompany(Company company) {
+    public static void deleteCompany(@Valid Company company) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.delete(company);
@@ -119,12 +123,218 @@ public class CompanyDao {
 
         return results.stream()
                 .map(result -> new CompanyIncomeDto(
-                        (Long) result[0],
+                        (long) result[0],
                         (String) result[1],
                         (BigDecimal) result[2]))
                 .collect(Collectors.toList());
     }
 
+    public static List<CompanyEmployeeBuildingDto> buildingsServicedByEmployeesInCompany(long companyId) {
+        List<Object[]> results;
+        try(Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Object[]> cr = cb.createQuery(Object[].class);
+
+            Root<Building> root = cr.from(Building.class);
+            Join<Building, EmployeeInCompany> buildingEmployeeInCompanyJoin = root.join("employeeInCompany");
+            Join<EmployeeInCompany, Company> employeeInCompanyCompanyJoin = buildingEmployeeInCompanyJoin.join("company");
+            Join<EmployeeInCompany, Employee> employeeInCompanyEmployeeJoin = buildingEmployeeInCompanyJoin.join("employee");
+
+            cr.multiselect(
+                    employeeInCompanyCompanyJoin.get("id"), //company
+                    employeeInCompanyCompanyJoin.get("name"),
+                    employeeInCompanyEmployeeJoin.get("id"), //employee
+                    employeeInCompanyEmployeeJoin.get("name"),
+                    root.get("id") //building
+            );
+
+            cr.where(cb.equal(employeeInCompanyCompanyJoin.get("id"), companyId));
+
+            results = session.createQuery(cr).getResultList();
+        }
+
+        return results.stream()
+                .map(result -> new CompanyEmployeeBuildingDto(
+                        (long) result[0],
+                        (String) result[1],
+                        (long) result[2],
+                        (String) result[3],
+                        (long) result[4],
+                        0
+                        ))
+                .collect(Collectors.toList());
+    }
+
+    public static List<CompanyEmployeeBuildingDto> numberOfBuildingsServicedByEmployeesInCompany(long companyId) {
+        List<Object[]> results;
+        try(Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Object[]> cr = cb.createQuery(Object[].class);
+
+            Root<Building> root = cr.from(Building.class);
+            Join<Building, EmployeeInCompany> buildingEmployeeInCompanyJoin = root.join("employeeInCompany");
+            Join<EmployeeInCompany, Company> employeeInCompanyCompanyJoin = buildingEmployeeInCompanyJoin.join("company");
+            Join<EmployeeInCompany, Employee> employeeInCompanyEmployeeJoin = buildingEmployeeInCompanyJoin.join("employee");
+
+            cr.multiselect(
+                    employeeInCompanyCompanyJoin.get("id"), //company
+                    employeeInCompanyCompanyJoin.get("name"),
+                    employeeInCompanyEmployeeJoin.get("id"), //employee
+                    employeeInCompanyEmployeeJoin.get("name"),
+                    cb.count(root.get("id")) //building
+            );
+
+            cr.where(cb.equal(employeeInCompanyCompanyJoin.get("id"), companyId));
+            cr.groupBy(employeeInCompanyEmployeeJoin.get("id"));
+
+            results = session.createQuery(cr).getResultList();
+        }
+
+        return results.stream()
+                .map(result -> new CompanyEmployeeBuildingDto(
+                        (long) result[0],
+                        (String) result[1],
+                        (long) result[2],
+                        (String) result[3],
+                        0,
+                        (long) result[4]
+                ))
+                .collect(Collectors.toList());
+    }
 
 
+    public static BigDecimal getCompanySumUnpaidTaxes(long companyId) {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Object[]> cr = cb.createQuery(Object[].class);
+
+            Root<Tax> root = cr.from(Tax.class);
+            Join<Tax, Apartment> taxApartmentJoin = root.join("apartment");
+            Join<Apartment, Building> apartmentBuildingJoin = taxApartmentJoin.join("building");
+            Join<Building, EmployeeInCompany> buildingEmployeeInCompanyJoin = apartmentBuildingJoin.join("employeeInCompany");
+            Join<EmployeeInCompany, Company> employeeInCompanyCompanyJoin = buildingEmployeeInCompanyJoin.join("company");
+
+            cr.multiselect(
+                    cb.sum(root.get("amount")),
+                    employeeInCompanyCompanyJoin.get("id")
+            );
+            Predicate wherePredicate = cb.conjunction();
+            wherePredicate = cb.and(wherePredicate, cb.isNull(root.get("dateOfPayment")));
+            wherePredicate = cb.and(wherePredicate, cb.equal(employeeInCompanyCompanyJoin.get("id"), companyId));
+
+            cr.where(wherePredicate);
+
+            return (BigDecimal) session.createQuery(cr).getSingleResult()[0];
+        }
+
+    }
+
+    public static List<TaxDto> getCompanyUnpaidTaxes(long companyId) {
+        List<Object[]> results;
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Object[]> cr = cb.createQuery(Object[].class);
+
+            Root<Tax> root = cr.from(Tax.class);
+            Join<Tax, Apartment> taxApartmentJoin = root.join("apartment");
+            Join<Apartment, Building> apartmentBuildingJoin = taxApartmentJoin.join("building");
+            Join<Building, EmployeeInCompany> buildingEmployeeInCompanyJoin = apartmentBuildingJoin.join("employeeInCompany");
+            Join<EmployeeInCompany, Company> employeeInCompanyCompanyJoin = buildingEmployeeInCompanyJoin.join("company");
+
+            cr.multiselect(
+                    root.get("id"),
+                    root.get("dateOfIssue"),
+                    root.get("amount"),
+                    taxApartmentJoin.get("id"),
+                    employeeInCompanyCompanyJoin.get("id")
+            );
+
+            Predicate wherePredicate = cb.conjunction();
+            wherePredicate = cb.and(wherePredicate, cb.isNull(root.get("dateOfPayment")));
+            wherePredicate = cb.and(wherePredicate, cb.equal(employeeInCompanyCompanyJoin.get("id"), companyId));
+
+            cr.where(wherePredicate);
+
+            results = session.createQuery(cr).getResultList();
+
+        }
+        return results.stream()
+                .map(result -> new TaxDto(
+                        (long) result[0],
+                        (LocalDate) result[1],
+                        (BigDecimal) result[2],
+                        (LocalDate) null,
+                        (Apartment) ApartmentDao.getApartmentById((long)result[3])/*null*/
+                ))
+                .collect(Collectors.toList());
+
+    }
+
+    public static BigDecimal getCompanySumPaidTaxes(long companyId) {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Object[]> cr = cb.createQuery(Object[].class);
+
+            Root<Tax> root = cr.from(Tax.class);
+            Join<Tax, Apartment> taxApartmentJoin = root.join("apartment");
+            Join<Apartment, Building> apartmentBuildingJoin = taxApartmentJoin.join("building");
+            Join<Building, EmployeeInCompany> buildingEmployeeInCompanyJoin = apartmentBuildingJoin.join("employeeInCompany");
+            Join<EmployeeInCompany, Company> employeeInCompanyCompanyJoin = buildingEmployeeInCompanyJoin.join("company");
+
+            cr.multiselect(
+                    cb.sum(root.get("amount")),
+                    employeeInCompanyCompanyJoin.get("id")
+            );
+            Predicate wherePredicate = cb.conjunction();
+            wherePredicate = cb.and(wherePredicate, cb.isNotNull(root.get("dateOfPayment")));
+            wherePredicate = cb.and(wherePredicate, cb.equal(employeeInCompanyCompanyJoin.get("id"), companyId));
+
+            cr.where(wherePredicate);
+
+            return (BigDecimal) session.createQuery(cr).getSingleResult()[0];
+        }
+
+    }
+
+    public static List<TaxDto> getCompanyPaidTaxes(long companyId) {
+        List<Object[]> results;
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Object[]> cr = cb.createQuery(Object[].class);
+
+            Root<Tax> root = cr.from(Tax.class);
+            Join<Tax, Apartment> taxApartmentJoin = root.join("apartment");
+            Join<Apartment, Building> apartmentBuildingJoin = taxApartmentJoin.join("building");
+            Join<Building, EmployeeInCompany> buildingEmployeeInCompanyJoin = apartmentBuildingJoin.join("employeeInCompany");
+            Join<EmployeeInCompany, Company> employeeInCompanyCompanyJoin = buildingEmployeeInCompanyJoin.join("company");
+
+            cr.multiselect(
+                    root.get("id"),
+                    root.get("dateOfIssue"),
+                    root.get("amount"),
+                    root.get("dateOfPayment"),
+                    taxApartmentJoin.get("id"),
+                    employeeInCompanyCompanyJoin.get("id")
+            );
+
+            Predicate wherePredicate = cb.conjunction();
+            wherePredicate = cb.and(wherePredicate, cb.isNotNull(root.get("dateOfPayment")));
+            wherePredicate = cb.and(wherePredicate, cb.equal(employeeInCompanyCompanyJoin.get("id"), companyId));
+
+            cr.where(wherePredicate);
+
+            results = session.createQuery(cr).getResultList();
+
+        }
+        return results.stream()
+                .map(result -> new TaxDto(
+                        (long) result[0],
+                        (LocalDate) result[1],
+                        (BigDecimal) result[2],
+                        (LocalDate) result[3],
+                        (Apartment) ApartmentDao.getApartmentById((long)result[4])
+                ))
+                .collect(Collectors.toList());
+
+    }
 }

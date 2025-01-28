@@ -18,6 +18,7 @@ dependencies {
     implementation("org.glassfish.expressly:expressly:5.0.0")
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("com.h2database:h2:2.1.214")
 }
 
 tasks.test {

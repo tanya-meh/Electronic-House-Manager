@@ -16,11 +16,6 @@ public class Company extends BaseEntity{
     public Company() {
     }
 
-    public Company(String name, Set<EmployeeInCompany> employeesInCompany) {
-        this.name = name;
-        this.employeesInCompany = employeesInCompany;
-    }
-
     public Company(String name) {
         this.name = name;
     }

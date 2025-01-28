@@ -1,5 +1,6 @@
 package org.example.dao;
 
+import jakarta.validation.Valid;
 import org.example.configuration.SessionFactoryUtil;
 import org.example.dto.HiredEmployeeInCompanyDto;
 import org.example.entity.Building;
@@ -10,7 +11,7 @@ import org.hibernate.Transaction;
 import java.util.Set;
 
 public class EmployeeInCompanyDao {
-    public static void createEmployeeInCompany(EmployeeInCompany employeeInCompany) {
+    public static void createEmployeeInCompany(@Valid EmployeeInCompany employeeInCompany) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.save(employeeInCompany);
@@ -18,7 +19,7 @@ public class EmployeeInCompanyDao {
         }
     }
 
-    public static void updateEmployeeInCompany(EmployeeInCompany employeeInCompany) {
+    public static void updateEmployeeInCompany(@Valid EmployeeInCompany employeeInCompany) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.saveOrUpdate(employeeInCompany);
@@ -26,7 +27,7 @@ public class EmployeeInCompanyDao {
         }
     }
 
-    public static void deleteEmployeeInCompany(EmployeeInCompany employeeInCompany) {
+    public static void deleteEmployeeInCompany(@Valid EmployeeInCompany employeeInCompany) {
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             session.delete(employeeInCompany);

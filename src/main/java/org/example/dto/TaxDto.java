@@ -17,6 +17,14 @@ public class TaxDto {
         this.dateOfIssue = dateOfIssue;
     }
 
+    public TaxDto(long id, LocalDate dateOfIssue, BigDecimal amount, LocalDate dateOfPayment, Apartment apartment) {
+        this.id = id;
+        this.dateOfIssue = dateOfIssue;
+        this.amount = amount;
+        this.dateOfPayment = dateOfPayment;
+        this.apartment = apartment;
+    }
+
     public long getId() {
         return id;
     }
@@ -55,5 +63,16 @@ public class TaxDto {
 
     public void setApartment(Apartment apartment) {
         this.apartment = apartment;
+    }
+
+    @Override
+    public String toString() {
+        return "TaxDto{" +
+                "id=" + id +
+                ", dateOfIssue=" + dateOfIssue +
+                ", amount=" + amount +
+                ", dateOfPayment=" + dateOfPayment +
+                ", apartmentId=" + apartment.getId() +
+                '}';
     }
 }

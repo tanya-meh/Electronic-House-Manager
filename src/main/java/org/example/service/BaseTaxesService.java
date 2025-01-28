@@ -30,7 +30,10 @@ public class BaseTaxesService {
             baseTaxes.setTaxPerResident(baseTaxesDto.getTaxPerResident());
             baseTaxes.setTaxPerPet(baseTaxesDto.getTaxPerPet());
             baseTaxes.setBuilding(baseTaxesDto.getBuilding());
+        } else {
+            throw new IllegalArgumentException("BaseTaxes not found.");
         }
+
         BaseTaxesDao.updateBaseTaxes(baseTaxes);
     }
 
@@ -38,6 +41,8 @@ public class BaseTaxesService {
         BaseTaxes baseTaxes = BaseTaxesDao.getBaseTaxesById(id);
         if(baseTaxes != null) {
             BaseTaxesDao.deleteBaseTaxes(baseTaxes);
+        } else {
+            throw new IllegalArgumentException("BaseTaxes not found.");
         }
     }
 
@@ -47,6 +52,8 @@ public class BaseTaxesService {
         if (baseTaxes != null && building != null) {
             baseTaxes.setBuilding(building);
             BaseTaxesDao.updateBaseTaxes(baseTaxes);
+        } else {
+            throw new IllegalArgumentException("BaseTaxes or Building not found.");
         }
     }
 }

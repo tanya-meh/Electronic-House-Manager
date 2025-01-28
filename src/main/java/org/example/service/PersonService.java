@@ -22,6 +22,8 @@ public class PersonService {
         Person person = PersonDao.getPersonById(PersonDto.getId());
         if(person != null) {
             person.setName(PersonDto.getName());
+        } else {
+            throw new IllegalArgumentException("Person not found.");
         }
         PersonDao.updatePerson(person);
     }
@@ -30,6 +32,8 @@ public class PersonService {
         Person person = PersonDao.getPersonById(id);
         if(person != null) {
             PersonDao.deletePerson(person);
+        } else {
+            throw new IllegalArgumentException("Person not found.");
         }
     }
 }

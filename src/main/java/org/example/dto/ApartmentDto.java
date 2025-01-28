@@ -15,10 +15,7 @@ public class ApartmentDto {
     private int floor;
     private BigDecimal area;
     private Building building;
-    private Set<Owner> owners = new HashSet<>();
-    private Set<Resident> residents = new HashSet<>();
     private int numberOfPets;
-    private Set<Tax> taxes = new HashSet<>();
 
     public ApartmentDto(long id, int number, int floor, BigDecimal area) {
         this.id = id;
@@ -67,22 +64,6 @@ public class ApartmentDto {
         this.building = building;
     }
 
-    public Set<Owner> getOwners() {
-        return owners;
-    }
-
-    public void setOwners(Set<Owner> owners) {
-        this.owners = owners;
-    }
-
-    public Set<Resident> getResidents() {
-        return residents;
-    }
-
-    public void setResidents(Set<Resident> residents) {
-        this.residents = residents;
-    }
-
     public int getNumberOfPets() {
         return numberOfPets;
     }
@@ -91,11 +72,5 @@ public class ApartmentDto {
         this.numberOfPets = numberOfPets;
     }
 
-    public Set<Tax> getTaxes() {
-        return taxes;
-    }
 
-    public void setTaxes(Set<Tax> taxes) {
-        this.taxes = taxes;
-    }
 }
