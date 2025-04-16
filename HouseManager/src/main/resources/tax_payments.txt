@@ -1,0 +1,7 @@
+PAYED TAX Company ID: 1, Company name: Domoupravitel 1, Employee ID: 1, Employee name: Ivan Georgiev, Building ID: 1, Apartment ID: 1, Tax ID: 1, Amount: 235.00, Date of payment: 2025-04-17
+PAYED TAX Company ID: 1, Company name: Domoupravitel 1, Employee ID: 1, Employee name: Ivan Georgiev, Building ID: 1, Apartment ID: 2, Tax ID: 2, Amount: 162.50, Date of payment: 2025-04-17
+PAYED TAX Company ID: 1, Company name: Domoupravitel 1, Employee ID: 1, Employee name: Ivan Georgiev, Building ID: 1, Apartment ID: 3, Tax ID: 3, Amount: 235.00, Date of payment: 2025-04-17
+PAYED TAX Company ID: 1, Company name: Domoupravitel 1, Employee ID: 2, Employee name: Petar Kolev, Building ID: 2, Apartment ID: 4, Tax ID: 4, Amount: 201.00, Date of payment: 2025-04-17
+PAYED TAX Company ID: 1, Company name: Domoupravitel 1, Employee ID: 2, Employee name: Petar Kolev, Building ID: 2, Apartment ID: 6, Tax ID: 6, Amount: 162.00, Date of payment: 2025-04-17
+PAYED TAX Company ID: 2, Company name: Home management, Employee ID: 1, Employee name: Ivan Georgiev, Building ID: 3, Apartment ID: 8, Tax ID: 8, Amount: 170.00, Date of payment: 2025-04-17
+PAYED TAX Company ID: 2, Company name: Home management, Employee ID: 11, Employee name: Kaloyan Kaloyanov, Building ID: 4, Apartment ID: 10, Tax ID: 10, Amount: 270.00, Date of payment: 2025-04-17
